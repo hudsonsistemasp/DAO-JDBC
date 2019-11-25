@@ -61,17 +61,8 @@ public class SellerDaoJDBC implements SellerDao{
 			
 			//Aqui eu mexo o ponteiro da posição 0 para a 1 e identifico se veio algum registro do banco, caso contrário retorno null
 			if(rs.next()) {
-				Department dep = new Department();
-				dep.setId(rs.getInt("DepartmentId"));
-				dep.setName(rs.getString("DepName"));
-				
-				Seller seller = new Seller();
-				seller.setId(rs.getInt("Id"));
-				seller.setName(rs.getString("Name"));
-				seller.setEmail(rs.getString("Email"));
-				seller.setBirthDate(rs.getDate("BirthDate"));
-				seller.setSalary(rs.getDouble("BaseSalary"));
-				seller.setDepartment(dep);
+				Department dep = instantiateDepartment(rs);
+				Seller seller = instantiateSeller(rs, dep);
 				return seller;
 			}
 			return null;
@@ -83,6 +74,24 @@ public class SellerDaoJDBC implements SellerDao{
 			DB.closeStatement(pst);
 			DB.closeResultSet(rs);
 		}
+	}
+
+	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException{
+		Seller seller = new Seller();
+		seller.setId(rs.getInt("Id"));
+		seller.setName(rs.getString("Name"));
+		seller.setEmail(rs.getString("Email"));
+		seller.setBirthDate(rs.getDate("BirthDate"));
+		seller.setSalary(rs.getDouble("BaseSalary"));
+		seller.setDepartment(dep);
+		return seller;
+	}
+
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {
+		Department dep = new Department();
+		dep.setId(rs.getInt("DepartmentId"));
+		dep.setName(rs.getString("DepName"));
+		return dep;
 	}
 
 	@Override
