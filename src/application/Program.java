@@ -2,6 +2,8 @@ package application;
 
 import java.util.Date;
 
+import model.dao.DaoFactory;
+import model.dao.SellerDao;
 import model.entites.Department;
 import model.entites.Seller;
 
@@ -15,4 +17,8 @@ public class Program {
 		System.out.println(seller);
 	}
 
+	//Instanciando um objeto da Factory. É uma das formas de fazer a injeção de dependência sem mostrar a implementação
+	SellerDao sellerDao = DaoFactory.createSellerDao();
+	
+	
 }
