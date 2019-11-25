@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 public class DB {
@@ -26,7 +28,7 @@ public class DB {
 	}
 	
 	//Abrindo a conexão com o MySQL
-	private static Connection getConnection() {
+	public static Connection getConnection() {
 		if(conn == null) {
 			Properties pro = loadConfigurations();
 			String url = pro.getProperty("dburl");//Vem do arquivo db.properties. Colocar a propriedade do jeito que está lá
@@ -42,7 +44,7 @@ public class DB {
 	}
 	
 	//Fechando conexão com o banco
-	private static Connection closeConnection() {
+	public static Connection closeConnection() {
 		if(conn != null) {
 			try {
 				conn.close();
@@ -54,5 +56,26 @@ public class DB {
 		return null;
 	}
 	
+	public static void closeStatement(Statement st) {
+		if (st != null) {
+			try {
+				st.close();
+			}
+			catch(SQLException e) {
+				throw new DbException(e.getMessage());
+			}
+			
+		}
+	}
 	
+	public static void closeResultSet(ResultSet rs) {
+		if(rs != null) {
+			try {
+				rs.close();
+			}
+			catch(SQLException e) {
+				throw new DbException(e.getMessage());
+			}
+		}
+	}
 }
