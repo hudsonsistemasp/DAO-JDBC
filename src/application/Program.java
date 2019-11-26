@@ -1,9 +1,10 @@
 package application;
 
-import java.util.Date;
+import java.util.List;
 
 import model.dao.DaoFactory;
 import model.dao.SellerDao;
+import model.entites.Department;
 import model.entites.Seller;
 
 public class Program {
@@ -23,8 +24,13 @@ public class Program {
 		Seller seller2 = sellerDao.findById(4);
 		System.out.println(seller2);
 		
-		
+		System.out.println("\n------Seller findById --------");
+		Department department = new Department(1, null);
+		List<Seller> listSeller = sellerDao.findByDepartment(department);
 
+		for(Seller obj : listSeller) {
+			System.out.println(obj);
+		}
 	}
 
 	

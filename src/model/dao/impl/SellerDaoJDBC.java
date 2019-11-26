@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -76,6 +79,59 @@ public class SellerDaoJDBC implements SellerDao{
 		}
 	}
 
+	@Override
+	public List<Seller> findAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Seller> findByDepartment(Department department) {
+		
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			pst = conn.prepareStatement("SELECT seller.*,department.Name as DepName " + 
+					"FROM seller INNER JOIN department " + 
+					"ON seller.DepartmentId = department.Id " + 
+					"WHERE DepartmentId = ? " + 
+					"ORDER BY Name");
+			
+			pst.setInt(1, department.getId());//Setando o valor no parâmetro da consulta
+			rs = pst.executeQuery();
+			
+			/*Como retornará uma lista temos que percorrer com a estrutura de repetição para ver se retornou valores.
+			 * rs.next() faz o ponteiro do resultset mover da posição 0 para a 1 e retorna TRUE se tiver registros à partir de então*/
+			List<Seller> listSeller = new ArrayList<>();//Para guardarmos o retorno dos dados do banco
+			
+			/*Criar um map para controlar a criação do objeto Department, pois temos vários Seller vinculados a um 
+			  objeto Dep e deixaremos uma referência de memória: 1 .* sellers    */ 
+			Map<Integer,Department> mapDep = new HashMap<>();
+			
+			while(rs.next()) {
+				//Vamos controlar pelo código do departamento
+				Department dep = mapDep.get(rs.getInt("DepartmentId"));//get traz o valor dessa chave, se não tem vem null
+				if (dep == null) {
+					dep = instantiateDepartment(rs);
+					mapDep.put(rs.getInt("DepartmentId"), dep);
+				}
+				
+				Seller seller = instantiateSeller(rs, dep);
+				listSeller.add(seller);
+			}
+			return listSeller;
+			
+		}
+		catch(SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally{
+			DB.closeStatement(pst);
+			DB.closeResultSet(rs);
+		}
+	}
+
 	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException{
 		Seller seller = new Seller();
 		seller.setId(rs.getInt("Id"));
@@ -94,10 +150,25 @@ public class SellerDaoJDBC implements SellerDao{
 		return dep;
 	}
 
-	@Override
-	public List<Seller> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
