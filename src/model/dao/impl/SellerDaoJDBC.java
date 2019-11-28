@@ -1,13 +1,10 @@
 package model.dao.impl;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +67,6 @@ public class SellerDaoJDBC implements SellerDao{
 	@Override
 	public void update(Seller seller) {
 		PreparedStatement ps = null;
-		ResultSet rs = null;
 		
 		try {
 			ps = conn.prepareStatement("UPDATE seller "
@@ -83,6 +79,7 @@ public class SellerDaoJDBC implements SellerDao{
 			ps.setInt(4, seller.getDepartment().getId());
 			ps.setInt(5, seller.getId());
 			
+			conn.commit();
 			int sellerUpdated = ps.executeUpdate();
 			
 			if (sellerUpdated > 0) {
@@ -90,10 +87,16 @@ public class SellerDaoJDBC implements SellerDao{
 			} 
 			
 		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
+			try {
+				conn.rollback();
+				throw new DbException(e.getMessage());
+			}
+			catch(SQLException e1){
+				System.out.println("Danger: Rollback falhou! Causa do falha: " + e1.getMessage());
+			}
+			
 		}
 		finally {
-			DB.closeResultSet(rs);
 			DB.closeStatement(ps);
 		}
 
@@ -101,7 +104,7 @@ public class SellerDaoJDBC implements SellerDao{
 
 	@Override
 	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
+
 		
 	}
 
