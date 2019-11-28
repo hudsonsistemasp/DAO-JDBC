@@ -1,5 +1,6 @@
 package application;
 
+import java.util.Date;
 import java.util.List;
 
 import model.dao.DaoFactory;
@@ -18,20 +19,46 @@ public class Program {
 		Seller seller = new Seller(1, "REgis", "email@email.com", new Date(), 100000.0, dep);
 		System.out.println(seller);*/
 
-		System.out.println("------Seller findById --------");
 		//Instanciando um objeto da Factory. É uma das formas de fazer a injeção de dependência sem mostrar a implementação
 		SellerDao sellerDao = DaoFactory.createSellerDao();
+		
+		/*
+		System.out.println("------Seller findById --------");
 		Seller seller2 = sellerDao.findById(4);
 		System.out.println(seller2);
 		
-		System.out.println("\n------Seller findById --------");
+		System.out.println("\n------Seller findByDepartment --------");
 		Department department = new Department(1, null);
 		List<Seller> listSeller = sellerDao.findByDepartment(department);
 
 		for(Seller obj : listSeller) {
 			System.out.println(obj);
 		}
+		
+		System.out.println("\n------Seller findAll --------");
+		List<Seller> listAllSeller = sellerDao.findAll();
+		for(Seller obj : listAllSeller) {
+			System.out.println(obj);
+		}
+	*/
+		System.out.println("\n------Seller Insert --------");
+		Seller newSeller = new Seller(0, "James", "james@gmail.com", new Date(), 5000.0, new Department(5,"D1"));
+		sellerDao.insert(newSeller);
+		
 	}
 
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

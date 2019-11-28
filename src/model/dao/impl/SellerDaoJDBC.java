@@ -1,9 +1,13 @@
 package model.dao.impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +30,43 @@ public class SellerDaoJDBC implements SellerDao{
 	
 	@Override
 	public void insert(Seller seller) {
-		// TODO Auto-generated method stub
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			ps = conn.prepareStatement("INSERT INTO seller "
+					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+					+ "VALUES "
+					+ "(?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, seller.getName());
+			ps.setString(2, seller.getEmail());
+			java.sql.Date dataSqlSeller = new java.sql.Date(seller.getBirthDate().getTime());
+			ps.setDate(3, dataSqlSeller);
+			ps.setDouble(4, seller.getSalary());
+			ps.setInt(5, seller.getDepartment().getId());
+			
+			Integer rowsInserted = ps.executeUpdate();
+			
+			if(rowsInserted > 0) {
+				rs = ps.getGeneratedKeys();
+				while(rs.next()) {
+					int id = rs.getInt(1);
+					seller.setId(id);
+					System.out.println("Seller created. Id: " + id);
+				}
+			}
+			
+			
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
 		
 	}
 
 	@Override
 	public void update(Seller seller) {
-		// TODO Auto-generated method stub
+		
+		
 		
 	}
 
@@ -81,8 +115,49 @@ public class SellerDaoJDBC implements SellerDao{
 
 	@Override
 	public List<Seller> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			ps = conn.prepareStatement("SELECT seller.*,department.Name as DepName " + 
+					"FROM seller INNER JOIN department " + 
+					"ON seller.DepartmentId = department.Id " + 
+					"ORDER BY Name");
+			rs = ps.executeQuery();
+			
+			List<Seller> listAllSeller = new ArrayList<>();
+			
+			/*Para controle de criação de objeto Dep. Se ele já foi criado na memória heap, não vou instanciar novo objeto
+			  vou utlizar o que está no map, de acordo com a chave que é o próprio código do departamento*/
+			Map<Integer, Department> mapDep = new HashMap<>();
+			Department dep = null;
+			Seller seller = null;
+			while(rs.next()) {
+				Department objDep = mapDep.get(rs.getInt("DepartmentId"));
+				System.out.println(objDep);
+				if (objDep == null) {
+					System.out.println("Entrou para o id: " + rs.getInt("DepartmentId"));
+					objDep = instantiateDepartment(rs);
+					seller = instantiateSeller(rs, objDep);
+					listAllSeller.add(seller);
+					mapDep.put(rs.getInt("DepartmentId"), objDep);
+				}
+				else {
+					seller = instantiateSeller(rs, objDep);
+					listAllSeller.add(seller);
+				}
+			}
+			return listAllSeller;
+		}
+		catch(SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(ps);
+			DB.closeResultSet(rs);
+		}
+		
 	}
 
 	@Override
