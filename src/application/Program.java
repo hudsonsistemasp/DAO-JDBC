@@ -42,11 +42,18 @@ public class Program {
 		}
 	*/
 		System.out.println("\n------Seller Insert --------");
-		Seller newSeller = new Seller(0, "James", "james@gmail.com", new Date(), 5000.0, new Department(5,"D1"));
+		Seller newSeller = new Seller(0, "Rouls", "Rousl@gmail.com", new Date(), 5000.0, new Department(6,"D2"));
 		sellerDao.insert(newSeller);
+		System.out.println(newSeller.getId());
+		
+		System.out.println("\n------Seller Update --------");
+		newSeller.setName("Browns");
+		sellerDao.update(newSeller);
+		
 		
 	}
 
+	
 	
 }
 
