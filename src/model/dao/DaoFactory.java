@@ -1,6 +1,7 @@
 package model.dao;
 
 import db.DB;
+import model.dao.impl.DepartmentDaoJDBC;
 import model.dao.impl.SellerDaoJDBC;
 
 public class DaoFactory {
@@ -21,5 +22,8 @@ public class DaoFactory {
 		return new SellerDaoJDBC(DB.getConnection());//Feita uma injeção de dependência com a conexão do banco na implementação da interface
 	}
 	
+	public static DepartmentDao createDepartmentDao() {
+		return new DepartmentDaoJDBC(DB.getConnection());
+	}
 	
 }

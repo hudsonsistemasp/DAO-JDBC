@@ -89,7 +89,7 @@ public class SellerDaoJDBC implements SellerDao{
 		} catch (SQLException e) {
 			try {
 				conn.rollback();
-				throw new DbException(e.getMessage());
+				throw new DbException("Rollback feito! Causa do erro: " + e.getMessage());
 			}
 			catch(SQLException e1){
 				System.out.println("Danger: Rollback falhou! Causa do falha: " + e1.getMessage());
@@ -104,7 +104,23 @@ public class SellerDaoJDBC implements SellerDao{
 
 	@Override
 	public void deleteById(Integer id) {
-
+		PreparedStatement st = null;
+		
+		try {
+			st = conn.prepareStatement("DELETE FROM seller WHERE id = ? ",Statement.RETURN_GENERATED_KEYS);
+			st.setInt(1, id);
+			
+			int rowsDeleted = st.executeUpdate(); 
+			if (rowsDeleted > 0) {
+				System.out.println("Quantidade de registro(s) deletado(s): " + rowsDeleted);
+			}
+			else {
+				System.out.println("Alerta: Nenhum dado deletado!");
+			}
+		}
+		catch(SQLException e) {
+			throw new DbException("Dado não deletado. Causa do erro: " + e.getMessage());
+		}
 		
 	}
 
